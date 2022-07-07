@@ -6,72 +6,22 @@ import container
 calc = calculations.CalculateEv()
 
 
-class MiniMaxAi(container.PropContainer):
+class MiniMaxAi(container.Container):
     def __init__(self):
         super().__init__()
 
     def get_possible_moves(self, board):
-        # opp_player = 's'
-        # possible_moves = []
-        # temp_board = copy.deepcopy(board)
-        # if move is not None and temp_board[move] == 'x':
-        #     temp_board[move] = player
         return [index for index, x in enumerate(board) if x == 'x']
-        # if pos is not None:
-        #     board[pos] = opp_player
-        # for index, x in enumerate(temp_board):
-        #     if temp_board[index] == 'x':
-        #         possible_moves.append(index)
-
-        # possible_moves_temp = possible_moves[move - (self.rects_in_row * 2) - 1:move + (self.rects_in_row * 2) + 1]
-        # do_continue = False
-        # last_rel_index = 0
-        # stops = [x for x in range(4,4 +(5 * 18) + 1, 18)]
-        # possible_moves_temp_temp = copy.deepcopy(possible_moves_temp)
-        # for index,pos_move in enumerate(possible_moves_temp_temp):
-        #     if (last_rel_index + self.rects_in_row) - 4 == index:
-        #         do_continue = False
-        #     if do_continue:
-        #         possible_moves_temp.remove(pos_move)
-        #         continue
-        #
-        #     if index in stops:
-        #         do_continue = True
-        #         last_rel_index = index
-
-        # return possible_moves
 
     def calculate_score(self, current_board):
         score = 0
         opponent_score = 0
 
-        # score_circle = 0
-        # score_cross = 0
-        #
-        # if calc.find_if_winning(False, 5, current_board):
-        #     return -800
-        # if calc.find_if_winning(True, 5, current_board):
-        #     return 800
-        # if calc.find_if_winning(False, 4, current_board):
-        #     score_cross -= 400
-        #
-        # if calc.find_if_winning(False, 3, current_board):
-        #     score_cross -= 200
-        #
-        # if calc.find_if_winning(True, 4, current_board):
-        #     score_circle += 300
-        # if calc.find_if_winning(True, 3, current_board):
-        #     score_circle += 100
-        #
-        # return score_circle - score_cross
         for y in range(2, 6):
             if calc.find_if_winning(True, y, current_board):
                 score += y
             if calc.find_if_winning(False, y, current_board):
                 opponent_score += y
-
-        # if calc.has_blocked(has_blocked_board, player):
-        #     score += 10
 
         return score - opponent_score
 

@@ -5,7 +5,7 @@ import numpy as np
 import container
 
 
-class CalculateEv(container.PropContainer):
+class CalculateEv(container.Container):
     def __init__(self):
         super().__init__()
 
@@ -96,22 +96,6 @@ class CalculateEv(container.PropContainer):
                         return y
                     return True
 
-
-        # for x in indexes:
-        #     with contextlib.suppress(IndexError):
-        #         winning_poses.extend(
-        #             [list(range(x, x + ((limit_minus_one) * (self.rects_in_row + 1)), self.rects_in_row + 1)),
-        #              list(range(x, x + ((limit_minus_one) * (self.rects_in_row - 1)), self.rects_in_row - 1)),
-        #              list(range(x, x + ((limit_minus_one) * self.rects_in_row), self.rects_in_row)),
-        #              list(range(x, x + limit_minus_one))])
-        #
-        #
-        #
-        # for x in winning_poses:
-        #     counter = sum(y in player_indexes for y in x)
-        #     if counter == limit_minus_one:
-        #         # print("win")
-        #         return True
 
     def collect_info(self, circles, crosses):
         self.circles_on_the_screen = len(circles)

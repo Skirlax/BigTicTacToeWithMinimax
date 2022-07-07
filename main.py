@@ -16,19 +16,19 @@ calc = calculations.CalculateEv()
 timer = Stopwatch().reset()
 
 
-class MainRun(container.PropContainer):
+class Main(container.Container):
     def __init__(self):
         super().__init__()
-        self.run_it_all()
+        self._main()
 
-    def run_it_all(self):
+    def _main(self):
         self.screen.fill((0, 0, 0))
         circles_not_temp = []
         crosses_not_temp = []
         grid_rects = dr.draw_the_grid()
         calc.create_map(grid_rects)
         while True:
-            self.check_for_exit()
+            self._check_for_exit()
             self.clock.tick(self.FPS)
             timer.start()
             crosses = dr.draw_crosses(grid_rects, False, None)
@@ -52,11 +52,11 @@ class MainRun(container.PropContainer):
 
             pg.display.update()
 
-    def check_for_exit(self):
+    def _check_for_exit(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 exit(0)
 
 
 if __name__ == "__main__":
-    MainRun()
+    Main()

@@ -3,7 +3,7 @@ import pygame as pg
 pg.init()
 
 
-class PropContainer:
+class Container:
     scr_width = 400
     rect_size = 100
     scr_height = 400
