@@ -7,7 +7,7 @@ from stopwatch import Stopwatch
 import calculations
 import container
 import draw
-import play_with_me_tree
+import minimax
 
 pg.init()
 
@@ -41,7 +41,7 @@ class MainRun(container.PropContainer):
             calc.collect_info(circles_not_temp, crosses_not_temp)
             pg.display.update()
             if len(crosses_not_temp) == len(circles_not_temp):
-                move = play_with_me_tree.MiniMaxAi().find_best_move()
+                move = minimax.MiniMaxAi().find_best_move()
                 if move is None:
                     print("No moves left")
                     time.sleep(3)
