@@ -4,9 +4,10 @@ pg.init()
 
 
 class PropContainer:
-    scr_width = 1800
+    scr_width = 400
     rect_size = 100
-    scr_height = 900
+    scr_height = 400
+    rect_limit = 4
     screen = pg.display.set_mode([scr_width, scr_height])
     color_white = (255, 255, 255)
     color_red = (255, 0, 0)

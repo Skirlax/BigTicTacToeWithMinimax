@@ -1,12 +1,15 @@
+import contextlib
+
+import numpy as np
+
 import container
-import re
 
 
 class CalculateEv(container.PropContainer):
     def __init__(self):
         super().__init__()
 
-    def create_map(self, grid_rects):
+    def create_map(self, grid_rects, return_map=False):
         for rect in grid_rects:
             self.str_map.append('x')
 
@@ -58,14 +61,9 @@ class CalculateEv(container.PropContainer):
         else:
             return False
 
-    def find_if_winning(self, circle_or_cross, limit_minus_one, *args):
+    def find_if_winning(self, circle_or_cross, limit_minus_one, *args, return_indexes=False):
 
-
-
-        if circle_or_cross:
-            char = 'ci'
-        else:
-            char = 'cr'
+        char = 'ci' if circle_or_cross else 'cr'
         found_str = []
         str_map_2 = ''
         try:
@@ -73,66 +71,82 @@ class CalculateEv(container.PropContainer):
         except IndexError:
             str_map_2 = self.str_map
 
-        indexes = list(map(lambda x: x[0],enumerate(str_map_2)))
+        indexes = list(map(lambda x: x[0], enumerate(str_map_2)))
         player_indexes = [x for x in indexes if str_map_2[x] == char]
+        indexes_matrix = np.array(indexes)
+        indexes_matrix = indexes_matrix.reshape(self.rects_in_column, self.rects_in_row)
         winning_poses = []
-        for x in indexes:
-            try:
-                winning_poses.extend([list(range(x, x + ((5) * (self.rects_in_row + 1)), self.rects_in_row + 1))])
-                winning_poses.extend([list(range(x, x + ((5) * (self.rects_in_row - 1)), self.rects_in_row - 1))])
-                winning_poses.extend([list(range(x, x + ((5) * self.rects_in_row), self.rects_in_row))])
-                winning_poses.extend([list(range(x, x + 5))])
-            except IndexError:
-                pass
+        if not player_indexes:
+            return False
 
-        # index = 0
-        # player_indexes_sliced = []
-        # while index + 4 < len(player_indexes):
-        #     player_indexes_sliced.extend([player_indexes[index:index + 5]])
-        #     index += 5
-        # if len(player_indexes) > 5:
-        #     player_indexes = player_indexes_sliced
+        # save all diagonals to variable diagonals and use k=1 and k=2 len of row
+        diagonals = []
+        for k in range(0, self.rects_in_row):
+            if len(np.diag(indexes_matrix, k)) > limit_minus_one - 1 or len(
+                    np.diag(np.fliplr(indexes_matrix), k)) > limit_minus_one - 1:
+                diagonals.append(np.diag(indexes_matrix, k))
+                diagonals.append(np.diag(np.fliplr(indexes_matrix), k))
 
-        for x in winning_poses:
-            counter = 0
-            for y in x:
-                if y in sorted(player_indexes):
-                    counter += 1
-            if counter == limit_minus_one:
-                return True
+        columns = indexes_matrix.T
+
+        for element in [indexes_matrix, columns, diagonals]:
+            for y in element:
+                if sum(str_map_2[x] == char for x in y) > limit_minus_one - 1:
+                    if return_indexes:
+                        return y
+                    return True
 
 
-
-
-
-
-
-
-        # pattern_one = char * (limit_minus_one + 1)
-        # found_str.append(re.search(pattern_one, str_map_2))
-        # count_of_diags_plus = 0
-        # count_of_cols = 0
-        # count_of_diags_minus = 0
-        # different_chars = 0
-        # for idx, x in enumerate(str_map_2):
-        #     if x == char and found_str[0] is None:
-        #         different_chars += 1
-        #         if different_chars == 1:
-        #             continue
-        #         if str_map_2[idx - (self.rects_in_row + 1)] == char:
-        #             count_of_diags_plus += 1
-        #         if str_map_2[idx - (self.rects_in_row - 1)] == char:
-        #             count_of_diags_minus += 1
-        #         if str_map_2[idx - self.rects_in_row] == char:
-        #             count_of_cols += 1
-        #     if count_of_diags_plus == limit_minus_one or count_of_diags_minus == limit_minus_one or count_of_cols == limit_minus_one:
-        #         return True
+        # for x in indexes:
+        #     with contextlib.suppress(IndexError):
+        #         winning_poses.extend(
+        #             [list(range(x, x + ((limit_minus_one) * (self.rects_in_row + 1)), self.rects_in_row + 1)),
+        #              list(range(x, x + ((limit_minus_one) * (self.rects_in_row - 1)), self.rects_in_row - 1)),
+        #              list(range(x, x + ((limit_minus_one) * self.rects_in_row), self.rects_in_row)),
+        #              list(range(x, x + limit_minus_one))])
         #
-        # if found_str[0] is not None:
-        #     return True
-        # else:
-        #     return False
+        #
+        #
+        # for x in winning_poses:
+        #     counter = sum(y in player_indexes for y in x)
+        #     if counter == limit_minus_one:
+        #         # print("win")
+        #         return True
 
     def collect_info(self, circles, crosses):
         self.circles_on_the_screen = len(circles)
         self.crosses_on_the_screen = len(crosses)
+
+    def has_blocked(self, board, circle_or_cross):
+        if not self.find_if_winning(circle_or_cross, 2, board):
+            return False
+        char = 'ci' if circle_or_cross else 'cr'
+        enemy_char = "cr" if char == "ci" else "ci"
+
+        matrix = np.array(board)
+        matrix = matrix.reshape(self.rects_in_column, self.rects_in_row)
+        enemy_indexes = np.where(matrix == enemy_char)
+        # x_es = [x[0] for x in enemy_indexes]
+        # y_es = [x[1] for x in enemy_indexes]
+        enemy_indexes = [[x, y] for x, y in zip(enemy_indexes[0], enemy_indexes[1])]
+        # my_indexes = np.where(matrix == char)
+        for enemy_idx in enemy_indexes:
+            # print(enemy_idx[0])
+            try:
+                if matrix[enemy_idx[0]][enemy_idx[1] + 1] == char:
+                    return True
+            except IndexError:
+                pass
+            if matrix[enemy_idx[0]][enemy_idx[1] - 1] == char:
+                return True
+            try:
+                if matrix[enemy_idx[0] + 1][enemy_idx[1]] == char:
+                    return True
+            except IndexError:
+                pass
+
+            if matrix[enemy_idx[0] - 1][enemy_idx[1]] == char:
+                return True
+        return False
+
+        # Check if one player is blocking another

@@ -75,11 +75,14 @@ class DrawOnTheScreen(container.PropContainer):
 
     def draw_the_winning_five(self, winner_cross, winner_circle, circles, crosses, grid_rects):
         if winner_circle:
-            for x in circles:
+
+            indexes = calc.find_if_winning(True, self.rect_limit,return_indexes=True)
+            for x in indexes:
                 pg.draw.rect(self.screen, self.color_white, (grid_rects[x]), 6)
             self.game_won_by_circles = True
 
         if winner_cross:
-            for x in crosses:
+            indexes = calc.find_if_winning(False, self.rect_limit,return_indexes=True)
+            for x in indexes:
                 pg.draw.rect(self.screen, self.color_white, (grid_rects[x]), 6)
             self.game_won_by_crosses = True
